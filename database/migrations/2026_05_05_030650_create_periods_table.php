@@ -13,8 +13,15 @@ return new class extends Migration
     {
         Schema::create('periods', function (Blueprint $table) {
             $table->id();
-            $table->string('nama');
-            $table->year('tahun');
+
+            $table->string('name');
+
+            $table->date('start_date')->nullable();
+
+            $table->date('end_date')->nullable();
+
+            $table->boolean('is_active')->default(false);
+
             $table->timestamps();
         });
     }

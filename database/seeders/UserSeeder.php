@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
 
         // buat jabatan dulu
         $jabatan = Jabatan::create([
-            'nama' => 'Guru Tetap'
+            'name' => 'Guru Tetap'
         ]);
 
         // =====================
@@ -63,8 +63,16 @@ class UserSeeder extends Seeder
         ]);
 
         Guru::create([
-            'user_id' => $guruUser2->id,
-            'jabatan_id' => $jabatan->id
+            'user_id' => $guruUser1->id,
+            'jabatan_id' => $jabatan->id,
+
+            'nip' => '198812121',
+
+            'subject' => 'Matematika',
+
+            'phone' => '08123456789',
+
+            'address' => 'Bandung'
         ]);
 
         // =====================

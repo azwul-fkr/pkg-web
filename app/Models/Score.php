@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Score extends Model
 {
     use HasFactory;
+    protected $table = 'scores';
+    protected $guarded = [];
+    
 
     public function evaluation()
     {
@@ -17,5 +20,10 @@ class Score extends Model
     public function subKriteria()
     {
         return $this->belongsTo(SubKriteria::class);
+    }
+
+    public function indikator()
+    {
+        return $this->belongsTo(Indikator::class);
     }
 }

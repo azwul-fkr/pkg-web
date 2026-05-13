@@ -13,11 +13,27 @@ return new class extends Migration
     {
         Schema::create('self_assessments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('guru_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('period_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('sub_kriteria_id')->constrained()->cascadeOnDelete();
-            $table->integer('nilai');
+
+            $table->foreignId('guru_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->foreignId('period_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->enum('status', [
+                'draft',
+                'submitted',
+                'finalized'
+            ])->default('draft');
+
             $table->timestamps();
+
+            $table->unique([
+                'guru_id',
+                'period_id'
+            ]);
         });
     }
 

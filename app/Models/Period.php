@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Period extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'start_date',
+        'end_date',
+        'is_active',
+        'is_locked',
+    ];
 }

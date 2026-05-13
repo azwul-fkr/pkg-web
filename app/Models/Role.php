@@ -13,4 +13,9 @@ class Role extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function indikator()
+    {
+        return $this->belongsTo(Indikator::class);
+    }
 }

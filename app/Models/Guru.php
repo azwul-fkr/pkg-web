@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Guru extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'user_id',
+        'jabatan_id',
+        'nip',
+        'phone',
+        'address',
+        'subject',
+    ];
 
     public function user()
     {

@@ -12,10 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('kriterias', function (Blueprint $table) {
-             $table->id();
-    $table->string('nama');
-    $table->double('bobot'); // misal 0.3
-    $table->timestamps();
+            $table->id();
+
+            $table->string('name');
+
+            $table->double('bobot');
+
+            $table->timestamps();
         });
     }
 

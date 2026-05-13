@@ -8,7 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Evaluation extends Model
 {
     use HasFactory;
-
+    protected $fillable = [
+        'guru_id',
+        'user_id',
+        'period_id',
+        'status',
+        'guru_id',
+        'user_id',
+        'period_id',
+        'status',
+        'revision_note',
+        'feedback',
+        'recommendation',
+    ];
     public function guru()
     {
         return $this->belongsTo(Guru::class);
