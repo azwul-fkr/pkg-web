@@ -47,13 +47,13 @@ class MonitoringController extends Controller
                 'period_id' => $assignment->period_id,
             ])->first();
 
-            $status = 'Belum Dinilai';
+            $status = 'belum_mulai';
 
             $nilaiAkhir = null;
 
             if ($evaluation) {
 
-                $status = 'Sudah Dinilai';
+                $status = $evaluation->status;
 
                 $nilaiAkhir =
                     $service->calculateFinalScore(
@@ -100,7 +100,7 @@ class MonitoringController extends Controller
         $evaluation = Evaluation::with([
             'guru.user',
             'period',
-            'user',
+            'penilai',
             'scores.indikator.subKriteria.kriteria'
         ])->findOrFail($id);
 
@@ -181,6 +181,8 @@ class MonitoringController extends Controller
             $evaluation->update([
                 'status' => 'finalized',
                 'revision_note' => null,
+                'feedback' => $request->feedback,
+                'recommendation' => $request->recommendation,
             ]);
 
             return redirect()

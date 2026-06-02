@@ -9,14 +9,14 @@
                 <div>
                     <h3 class="text-xl font-bold text-slate-900">{{ $evaluation->guru->user->name }}</h3>
                     <p class="mt-1 text-sm text-slate-500">
-                        Penilai: {{ $evaluation->user->name }} • Periode: {{ $evaluation->period->name }}
+                        Penilai: {{ $evaluation->penilai?->name ?? '-' }} • Periode: {{ $evaluation->period->name }}
                     </p>
                 </div>
                 <span class="badge badge-info">{{ strtoupper($evaluation->status) }}</span>
             </div>
         </div>
 
-        @foreach ($groupedScores as $group)
+        @forelse ($groupedScores as $group)
             <section class="page-card">
                 <div class="page-card-header">
                     <div>
@@ -46,7 +46,9 @@
                     </table>
                 </div>
             </section>
-        @endforeach
+        @empty
+            <div class="empty-state">Belum ada skor penilaian untuk evaluation ini.</div>
+        @endforelse
 
         <form method="POST" action="{{ route('admin.monitoring.review', $evaluation->id) }}" class="page-card">
             @csrf
@@ -78,6 +80,18 @@
                     <div class="flex flex-wrap justify-end gap-2 pt-2">
                         <button type="submit" name="action" value="revisi" class="btn-danger">Minta Revisi</button>
                         <button type="submit" name="action" value="approve" class="btn-primary">Approve</button>
+                    </div>
+                @elseif ($evaluation->status == 'finalized')
+                    <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+                        Penilaian sudah difinalisasi dan hasilnya dapat dilihat oleh guru.
+                    </div>
+                @elseif ($evaluation->status == 'draft')
+                    <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+                        Penilai masih menyimpan draft. Admin dapat melakukan review setelah penilai submit.
+                    </div>
+                @elseif ($evaluation->status == 'revised')
+                    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+                        Penilaian sedang menunggu revisi dari penilai.
                     </div>
                 @endif
             </div>

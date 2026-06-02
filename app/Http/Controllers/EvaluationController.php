@@ -14,6 +14,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Assignment;
 use App\Models\Evidence;
 use App\Models\Indikator;
+use Illuminate\Support\Facades\DB;
 
 class EvaluationController extends Controller
 {
@@ -22,6 +23,10 @@ class EvaluationController extends Controller
     {
         $period = Period::where('is_active', true)
             ->first();
+
+        if (!$period) {
+            return back()->with('error', 'Periode aktif belum tersedia');
+        }
 
         $assignments = Assignment::with([
             'guru.user'
@@ -144,6 +149,14 @@ class EvaluationController extends Controller
             true
         )->first();
 
+        if (!$period) {
+
+            return back()->with(
+                'error',
+                'Periode aktif belum tersedia'
+            );
+        }
+
         /*
     =====================================================
     LOCK VALIDATION
@@ -158,98 +171,38 @@ class EvaluationController extends Controller
             );
         }
 
-        /*
-    =====================================================
-    CHECK EXISTING
-    =====================================================
-    */
-
-        $evaluation = Evaluation::where([
-
-            'guru_id' =>
-            $guruId,
-
-            'user_id' =>
-            auth()->id(),
-
-            'period_id' =>
-            $period->id,
-
-        ])->first();
-
-        /*
-    =====================================================
-    CREATE IF NOT EXIST
-    =====================================================
-    */
-
-        if (!$evaluation) {
-
-            $evaluation = Evaluation::create([
-
-                'guru_id' =>
-                $guruId,
-
-                'user_id' =>
-                auth()->id(),
-
-                'period_id' =>
-                $period->id,
-
-                'status' =>
-                'draft',
-
-            ]);
-        }
-
-        /*
-    =====================================================
-    DELETE OLD SCORES
-    =====================================================
-    */
-
-        Score::where(
-            'evaluation_id',
-            $evaluation->id
-        )->delete();
-
-        /*
-    =====================================================
-    SAVE SCORES
-    =====================================================
-    */
-
-        foreach ($request->scores as $indikatorId => $nilai) {
-
-            Score::create([
-
-                'evaluation_id' =>
-                $evaluation->id,
-
-                'indikator_id' =>
-                $indikatorId,
-
-                'nilai' =>
-                $nilai,
-
-                'comment' =>
-                $request->comments[$indikatorId]
-                    ?? null,
-
-            ]);
-        }
-
-        /*
-    =====================================================
-    STATUS
-    =====================================================
-    */
-
-        $evaluation->update([
-
-            'status' => 'draft'
-
+        $validated = $request->validate([
+            'scores' => ['required', 'array', 'min:1'],
+            'scores.*' => ['required', 'integer', 'min:1', 'max:5'],
+            'comments' => ['nullable', 'array'],
+            'comments.*' => ['nullable', 'string'],
         ]);
+
+        $evaluation = DB::transaction(function () use ($guruId, $period, $validated, $request) {
+
+            $evaluation = Evaluation::firstOrCreate(
+                [
+                    'guru_id' => $guruId,
+                    'user_id' => auth()->id(),
+                    'period_id' => $period->id,
+                ],
+                [
+                    'status' => 'draft',
+                ]
+            );
+
+            $this->syncScores(
+                $evaluation,
+                $validated['scores'],
+                $request->input('comments', [])
+            );
+
+            $evaluation->update([
+                'status' => 'draft'
+            ]);
+
+            return $evaluation;
+        });
 
         /*
     =====================================================
@@ -543,16 +496,17 @@ class EvaluationController extends Controller
 
                 'comment' => $score->comment,
             ];
-            $analytics =
-                $service->analytics(
-                    $evaluation->id
-                );
-
-            $bestWorst =
-                $service->bestAndWorstCompetency(
-                    $analytics
-                );
         }
+
+        $analytics =
+            $service->analytics(
+                $evaluation->id
+            );
+
+        $bestWorst =
+            $service->bestAndWorstCompetency(
+                $analytics
+            );
 
         return view(
             'penilai.hasil.detail',
@@ -802,6 +756,14 @@ class EvaluationController extends Controller
             true
         )->first();
 
+        if (!$period) {
+
+            return back()->with(
+                'error',
+                'Periode aktif belum tersedia'
+            );
+        }
+
         /*
     =====================================================
     LOCK VALIDATION
@@ -823,60 +785,24 @@ class EvaluationController extends Controller
     */
 
         $validated = $request->validate([
-
-            'scores' =>
-            'required|array',
-
+            'scores' => ['required', 'array', 'min:1'],
+            'scores.*' => ['required', 'integer', 'min:1', 'max:5'],
+            'comments' => ['nullable', 'array'],
+            'comments.*' => ['nullable', 'string'],
         ]);
 
-        /*
-    =====================================================
-    DELETE OLD SCORES
-    =====================================================
-    */
+        DB::transaction(function () use ($evaluation, $validated, $request) {
 
-        Score::where(
-            'evaluation_id',
-            $evaluation->id
-        )->delete();
+            $this->syncScores(
+                $evaluation,
+                $validated['scores'],
+                $request->input('comments', [])
+            );
 
-        /*
-    =====================================================
-    INSERT NEW SCORES
-    =====================================================
-    */
-
-        foreach ($validated['scores'] as $indikatorId => $nilai) {
-
-            Score::create([
-
-                'evaluation_id' =>
-                $evaluation->id,
-
-                'indikator_id' =>
-                $indikatorId,
-
-                'nilai' =>
-                $nilai,
-
-                'comment' =>
-                $request->comments[$indikatorId]
-                    ?? null,
-
+            $evaluation->update([
+                'status' => 'draft'
             ]);
-        }
-
-        /*
-    =====================================================
-    UPDATE STATUS
-    =====================================================
-    */
-
-        $evaluation->update([
-
-            'status' => 'draft'
-
-        ]);
+        });
 
         /*
     =====================================================
@@ -933,5 +859,52 @@ class EvaluationController extends Controller
                 'success',
                 'Penilaian berhasil disubmit'
             );
+    }
+
+    private function syncScores(
+        Evaluation $evaluation,
+        array $scores,
+        array $comments = []
+    ): void {
+        $indikatorIds = array_map(
+            'intval',
+            array_keys($scores)
+        );
+
+        $validIndikatorIds = Indikator::whereIn(
+            'id',
+            $indikatorIds
+        )->pluck('id')->map(fn ($id) => (int) $id)->all();
+
+        $invalidIndikatorIds = array_diff(
+            $indikatorIds,
+            $validIndikatorIds
+        );
+
+        if (!empty($invalidIndikatorIds)) {
+            abort(422, 'Data indikator penilaian tidak valid');
+        }
+
+        Score::where(
+            'evaluation_id',
+            $evaluation->id
+        )->whereNotIn(
+            'indikator_id',
+            $validIndikatorIds
+        )->delete();
+
+        foreach ($scores as $indikatorId => $nilai) {
+
+            Score::updateOrCreate(
+                [
+                    'evaluation_id' => $evaluation->id,
+                    'indikator_id' => (int) $indikatorId,
+                ],
+                [
+                    'nilai' => (int) $nilai,
+                    'comment' => $comments[$indikatorId] ?? null,
+                ]
+            );
+        }
     }
 }

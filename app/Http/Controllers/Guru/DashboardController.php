@@ -9,6 +9,7 @@ use App\Models\Guru;
 use App\Models\Period;
 use App\Services\EvaluationService;
 use App\Models\SelfAssessment;
+use App\Models\TeacherReflection;
 
 class DashboardController extends Controller
 {
@@ -34,11 +35,31 @@ class DashboardController extends Controller
             true
         )->first();
 
+        /*
+    =====================================
+    REFLECTION TERBARU
+    =====================================
+    */
+
+        $reflection = TeacherReflection::with(
+            'evaluation.period'
+        )
+
+            ->where(
+                'guru_id',
+                $guru->id
+            )
+
+            ->latest()
+
+            ->first();
+
         $totalEvidence = 0;
         $approvedEvidence = 0;
         $pendingEvidence = 0;
         $rejectedEvidence = 0;
         $evaluation = null;
+        $pendingEvaluation = null;
         $finalScore = null;
         $analytics = null;
         $gapAnalysis = null;
@@ -58,6 +79,7 @@ class DashboardController extends Controller
                     'pendingEvidence',
                     'rejectedEvidence',
                     'evaluation',
+                    'pendingEvaluation',
                     'finalScore',
                     'analytics',
                     'bestWorst',
@@ -107,7 +129,7 @@ class DashboardController extends Controller
         =====================================
         */
 
-        $evaluation = Evaluation::where(
+        $latestEvaluation = Evaluation::where(
             'guru_id',
             $guru->id
         )
@@ -125,6 +147,14 @@ class DashboardController extends Controller
             ->latest()
 
             ->first();
+
+        if ($latestEvaluation?->status === 'finalized') {
+
+            $evaluation = $latestEvaluation;
+        } else {
+
+            $pendingEvaluation = $latestEvaluation;
+        }
 
         /*
         =====================================
@@ -192,10 +222,12 @@ class DashboardController extends Controller
                 'pendingEvidence',
                 'rejectedEvidence',
                 'evaluation',
+                'pendingEvaluation',
                 'finalScore',
                 'analytics',
                 'bestWorst',
                 'gapAnalysis',
+                'reflection'
             )
         );
     }

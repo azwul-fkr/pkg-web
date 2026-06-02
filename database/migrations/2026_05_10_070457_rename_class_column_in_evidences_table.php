@@ -26,7 +26,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('evidences', function (Blueprint $table) {
-            //
+            $table->renameColumn(
+                'kelas',
+                'class'
+            );
         });
     }
 };

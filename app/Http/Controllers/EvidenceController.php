@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Evidence;
 use App\Models\Guru;
-use App\Models\Indikator;
 use Illuminate\Http\Request;
 use App\Models\Kriteria;
-use App\Models\SubKriteria;
-use Illuminate\Support\Facades\DB;
 
 class EvidenceController extends Controller
 {
@@ -187,21 +184,7 @@ class EvidenceController extends Controller
         $evidence->status =
             'pending';
 
-        /*
-    =====================================================
-    TRY SAVE
-    =====================================================
-    */
-
-        $result = $evidence->save();
-
-        dd(
-
-            $result,
-
-            $evidence->toArray()
-
-        );
+        $evidence->save();
 
         /*
     =====================================================
@@ -309,8 +292,8 @@ class EvidenceController extends Controller
             'subject' =>
             $request->subject,
 
-            'class' =>
-            $request->class,
+            'kelas' =>
+            $request->kelas,
 
             'tanggal' =>
             $request->tanggal,

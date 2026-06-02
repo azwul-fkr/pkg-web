@@ -37,7 +37,7 @@
                     <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
                         <div class="grid gap-2 text-sm text-slate-600">
                             <p><span class="font-bold text-slate-800">Mapel:</span> {{ $evidence->subject }}</p>
-                            <p><span class="font-bold text-slate-800">Kelas:</span> {{ $evidence->class }}</p>
+                            <p><span class="font-bold text-slate-800">Kelas:</span> {{ $evidence->kelas }}</p>
                             <p><span class="font-bold text-slate-800">Tanggal:</span> {{ $evidence->tanggal }}</p>
                             <p>{{ $evidence->description }}</p>
                         </div>

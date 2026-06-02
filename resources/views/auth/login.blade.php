@@ -27,7 +27,7 @@
                     <div class="mb-5 inline-flex items-center rounded-lg bg-white/10 px-4 py-2 text-sm font-semibold backdrop-blur">
                         Sistem Penilaian Kinerja Guru
                     </div>
-                    <h1 class="text-4xl font-bold leading-tight">SIMPEG MTs</h1>
+                    <h1 class="text-4xl font-bold leading-tight">SIMPEG MTSS JIDRIS ASSALAM</h1>
                     <p class="mt-4 text-lg leading-8 text-slate-100">
                         Portal terpadu untuk pengelolaan data guru, evidence, monitoring, dan penilaian kinerja madrasah.
                     </p>
@@ -37,9 +37,6 @@
             <section class="flex w-full items-center justify-center px-5 py-8 lg:w-[480px] lg:bg-slate-50/95 lg:px-10">
                 <div class="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-xl lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
                     <div class="mb-8">
-                        <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-lg bg-cyan-600 text-white shadow-sm">
-                            <span class="text-xl font-bold">S</span>
-                        </div>
                         <h2 class="text-2xl font-bold text-slate-900">Masuk ke akun</h2>
                         <p class="mt-2 text-sm text-slate-500">Gunakan email dan password yang sudah terdaftar.</p>
                     </div>

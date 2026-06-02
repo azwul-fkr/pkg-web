@@ -262,7 +262,7 @@ Route::middleware(['auth', 'role:penilai'])->prefix('penilai')->group(function (
     )->name('penilai.penilaian.edit');
 
     Route::get(
-        '/penilai/penilaian/{id}/review',
+        '/penilaian/{id}/review',
         [EvaluationController::class, 'review']
     )->name('penilai.penilaian.review');
 

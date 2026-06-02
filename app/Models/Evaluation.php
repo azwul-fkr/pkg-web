@@ -31,6 +31,11 @@ class Evaluation extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function user()
+    {
+        return $this->penilai();
+    }
+
     public function period()
     {
         return $this->belongsTo(Period::class);

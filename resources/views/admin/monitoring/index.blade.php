@@ -58,8 +58,25 @@
                                 <td>{{ $m['penilai'] }}</td>
                                 <td>{{ $m['periode'] }}</td>
                                 <td>
-                                    <span class="badge {{ $m['status'] == 'Sudah Dinilai' ? 'badge-success' : 'badge-danger' }}">
-                                        {{ $m['status'] }}
+                                    @php
+                                        $statusClass = [
+                                            'finalized' => 'badge-success',
+                                            'submitted' => 'badge-info',
+                                            'draft' => 'badge-warning',
+                                            'revised' => 'badge-danger',
+                                            'belum_mulai' => 'badge-danger',
+                                        ][$m['status']] ?? 'badge-info';
+
+                                        $statusLabel = [
+                                            'finalized' => 'Finalized',
+                                            'submitted' => 'Menunggu Review Admin',
+                                            'draft' => 'Draft Penilai',
+                                            'revised' => 'Perlu Revisi',
+                                            'belum_mulai' => 'Belum Dinilai',
+                                        ][$m['status']] ?? strtoupper($m['status']);
+                                    @endphp
+                                    <span class="badge {{ $statusClass }}">
+                                        {{ $statusLabel }}
                                     </span>
                                 </td>
                                 <td class="font-bold text-cyan-700">

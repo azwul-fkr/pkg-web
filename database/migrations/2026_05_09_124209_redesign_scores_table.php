@@ -13,8 +13,13 @@ return new class extends Migration
     {
         //
         Schema::table('scores', function (Blueprint $table) {
+            $table->index('evaluation_id');
 
             $table->dropForeign(['sub_kriteria_id']);
+
+            $table->dropUnique(
+                'scores_evaluation_id_sub_kriteria_id_unique'
+            );
 
             $table->dropColumn('sub_kriteria_id');
 
@@ -22,6 +27,11 @@ return new class extends Migration
                 ->after('evaluation_id')
                 ->constrained()
                 ->cascadeOnDelete();
+
+            $table->unique([
+                'evaluation_id',
+                'indikator_id'
+            ]);
         });
     }
 

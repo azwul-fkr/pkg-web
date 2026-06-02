@@ -2,6 +2,15 @@
     $user = auth()->user();
     $roleName = strtolower(optional(optional($user)->role)->name ?? '');
     $roleLabel = strtoupper($roleName ?: 'USER');
+    $pageTitle = trim($__env->yieldContent('title'));
+
+    if ($pageTitle === '' && isset($header)) {
+        $pageTitle = trim(strip_tags((string) $header));
+    }
+
+    if ($pageTitle === '') {
+        $pageTitle = 'Dashboard';
+    }
 
     $menus = [
         'admin' => [
@@ -116,7 +125,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'SIMPEG MTs')</title>
+    <title>{{ $pageTitle }} - SIMPEG MTSs</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
@@ -173,8 +182,8 @@
                     <i data-lucide="graduation-cap" class="h-5 w-5"></i>
                 </div>
                 <div class="min-w-0">
-                    <h1 class="truncate text-lg font-bold leading-tight">SIMPEG MTs</h1>
-                    <p class="text-sm text-slate-400">PKG Madrasah</p>
+                    <h1 class="truncate text-lg font-bold leading-tight">SIMPEG APP</h1>
+                    <p class="text-sm text-slate-400">MTS JIDRIS AS-SALAM</p>
                 </div>
             </div>
 
@@ -186,9 +195,13 @@
                 <div class="space-y-1">
                     @foreach ($navigation as $item)
                         @if (\Illuminate\Support\Facades\Route::has($item['route']))
+                            @php
+                                $isActive = request()->routeIs($item['active']);
+                            @endphp
                             <a href="{{ route($item['route']) }}"
-                                class="sidebar-link {{ request()->routeIs($item['active']) ? 'active' : '' }}"
-                                @click="sidebarOpen = false">
+                                class="sidebar-link {{ $isActive ? 'active' : '' }}"
+                                @if ($isActive) aria-current="page" @endif
+                                @click="{{ $isActive ? '$event.preventDefault()' : 'sidebarOpen = false' }}">
                                 <i data-lucide="{{ $item['icon'] }}"></i>
                                 <span class="truncate">{{ $item['label'] }}</span>
                             </a>
@@ -232,7 +245,7 @@
 
                         <div class="min-w-0">
                             <h2 class="truncate text-xl font-bold text-slate-900 sm:text-2xl">
-                                @yield('title', 'Dashboard')
+                                {{ $pageTitle }}
                             </h2>
                             <p class="mt-1 hidden text-sm text-slate-500 sm:block">
                                 Sistem Penilaian Kinerja Guru
@@ -313,14 +326,20 @@
                 @endif
 
                 {{-- PAGE CONTENT --}}
-                @yield('content')
+                @hasSection('content')
+                    @yield('content')
+                @elseif (isset($slot))
+                    {{ $slot }}
+                @endif
             </main>
         </div>
     </div>
 
     <script>
         const renderIcons = () => {
-            lucide.createIcons();
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
         };
 
         if (document.readyState === 'loading') {
