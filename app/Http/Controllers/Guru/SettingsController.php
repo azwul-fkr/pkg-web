@@ -95,10 +95,27 @@ class SettingsController extends Controller
             'theme' => 'required|in:light,dark,auto',
         ]);
 
-        auth()->user()->update(['theme_preference' => $validated['theme']]);
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User tidak ditemukan.',
+            ], 401);
+        }
+
+        $user->theme_preference = $validated['theme'];
+        $user->save();
+
+        if (!$request->expectsJson()) {
+            return redirect()
+                ->route('guru.settings.index')
+                ->with('success', 'Preferensi tema berhasil disimpan.');
+        }
 
         return response()->json([
             'success' => true,
+            'theme' => $user->theme_preference,
             'message' => 'Preferensi tema berhasil disimpan.',
         ]);
     }
