@@ -166,9 +166,24 @@ class MonitoringController extends Controller
 
     public function review(
         Request $request,
-        $id
+        $id,
+        EvaluationService $service
     ) {
         $evaluation = Evaluation::findOrFail($id);
+        $autoRecommendation = $service->generateRecommendations(
+            $evaluation->id
+        );
+
+        $manualRecommendation = trim((string) $request->recommendation);
+
+        $recommendationText = $autoRecommendation['text'];
+
+        if ($manualRecommendation !== '') {
+            $recommendationText =
+                $manualRecommendation
+                . "\n\nAI Recommendation Engine:\n"
+                . $autoRecommendation['text'];
+        }
 
         /*
     =====================================
@@ -182,7 +197,7 @@ class MonitoringController extends Controller
                 'status' => 'finalized',
                 'revision_note' => null,
                 'feedback' => $request->feedback,
-                'recommendation' => $request->recommendation,
+                'recommendation' => $recommendationText,
             ]);
 
             return redirect()
@@ -209,7 +224,7 @@ class MonitoringController extends Controller
             $request->feedback,
 
             'recommendation' =>
-            $request->recommendation,
+            $recommendationText,
         ]);
 
         return redirect()

@@ -15,6 +15,19 @@ class Guru extends Model
         'phone',
         'address',
         'subject',
+        'bio',
+        'photo_path',
+        'website',
+        'social_media_twitter',
+        'social_media_instagram',
+        'social_media_linkedin',
+        'achievements',
+        'certifications',
+    ];
+
+    protected $casts = [
+        'achievements' => 'array',
+        'certifications' => 'array',
     ];
 
     public function user()

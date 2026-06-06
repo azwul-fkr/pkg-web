@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Guru\SelfAssessmentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Guru\SettingsController as GuruSettingsController;
+use App\Http\Controllers\Penilai\DashboardController as PenilaiDashboardController;
+use App\Http\Controllers\Penilai\SettingsController as PenilaiSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +52,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         [DashboardController::class, 'index']
     )->name('dashboard');
 
+    // SETTINGS
+    Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
+    Route::post('/settings/profile', [AdminSettingsController::class, 'updateProfile'])->name('settings.updateProfile');
+    Route::post('/settings/theme', [AdminSettingsController::class, 'updateTheme'])->name('settings.updateTheme');
+    Route::post('/settings/password', [AdminSettingsController::class, 'updatePassword'])->name('settings.updatePassword');
 
     // VALIDASI EVIDENCE
     Route::get('/evidences', [App\Http\Controllers\EvidenceController::class, 'adminIndex'])
@@ -172,6 +181,16 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
         [App\Http\Controllers\Guru\DashboardController::class, 'index']
     )->name('guru.dashboard');
 
+    // SETTINGS
+    Route::get('/settings', [GuruSettingsController::class, 'index'])->name('guru.settings.index');
+    Route::post('/settings/biodata', [GuruSettingsController::class, 'updateBiodata'])->name('guru.settings.updateBiodata');
+    Route::post('/settings/photo', [GuruSettingsController::class, 'uploadPhoto'])->name('guru.settings.uploadPhoto');
+    Route::post('/settings/theme', [GuruSettingsController::class, 'updateTheme'])->name('guru.settings.updateTheme');
+    Route::post('/settings/achievement', [GuruSettingsController::class, 'addAchievement'])->name('guru.settings.addAchievement');
+    Route::delete('/settings/achievement/{achievement_id}', [GuruSettingsController::class, 'deleteAchievement'])->name('guru.settings.deleteAchievement');
+    Route::post('/settings/certification', [GuruSettingsController::class, 'addCertification'])->name('guru.settings.addCertification');
+    Route::delete('/settings/certification/{certification_id}', [GuruSettingsController::class, 'deleteCertification'])->name('guru.settings.deleteCertification');
+
     Route::get(
         '/evidence',
         [EvidenceController::class, 'index']
@@ -235,9 +254,13 @@ Route::middleware(['auth', 'role:guru'])->prefix('guru')->group(function () {
 // ================= PENILAI =================
 Route::middleware(['auth', 'role:penilai'])->prefix('penilai')->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('penilai.dashboard');
-    })->name('penilai.dashboard');
+    Route::get('/dashboard', [PenilaiDashboardController::class, 'index'])->name('penilai.dashboard');
+
+    // SETTINGS
+    Route::get('/settings', [PenilaiSettingsController::class, 'index'])->name('penilai.settings.index');
+    Route::post('/settings/profile', [PenilaiSettingsController::class, 'updateProfile'])->name('penilai.settings.updateProfile');
+    Route::post('/settings/theme', [PenilaiSettingsController::class, 'updateTheme'])->name('penilai.settings.updateTheme');
+    Route::post('/settings/password', [PenilaiSettingsController::class, 'updatePassword'])->name('penilai.settings.updatePassword');
 
     Route::get('/guru', [App\Http\Controllers\EvaluationController::class, 'guruList'])
         ->name('penilai.guru.index');

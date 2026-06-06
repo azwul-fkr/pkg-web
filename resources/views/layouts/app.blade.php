@@ -166,6 +166,67 @@
             height: 1.1rem;
             flex: none;
         }
+
+        /* Dark Mode Support */
+        :root {
+            color-scheme: light;
+        }
+
+        :root.dark {
+            color-scheme: dark;
+        }
+
+        :root.dark body {
+            @apply bg-slate-950 text-slate-100;
+        }
+
+        :root.dark .page-card {
+            @apply bg-slate-900 border-slate-700;
+        }
+
+        :root.dark .page-card-header {
+            @apply border-slate-700;
+        }
+
+        :root.dark .form-control {
+            @apply bg-slate-800 border-slate-700 text-slate-100;
+        }
+
+        :root.dark .form-control:focus {
+            @apply bg-slate-800 border-cyan-500;
+        }
+
+        :root.dark .form-label {
+            @apply text-slate-300;
+        }
+
+        :root.dark .tab-btn {
+            @apply text-slate-300;
+        }
+
+        :root.dark header {
+            @apply bg-slate-900/90 border-slate-700;
+        }
+
+        :root.dark .badge {
+            @apply bg-slate-700 text-slate-100;
+        }
+
+        :root.dark table {
+            @apply border-slate-700;
+        }
+
+        :root.dark th {
+            @apply bg-slate-800 text-slate-100 border-slate-700;
+        }
+
+        :root.dark td {
+            @apply border-slate-700;
+        }
+
+        :root.dark .empty-state {
+            @apply text-slate-400;
+        }
     </style>
 </head>
 
@@ -210,7 +271,7 @@
                 </div>
             </nav>
 
-            <div class="border-t border-white/10 p-4">
+            <div class="border-t border-white/10 p-4 space-y-3">
                 <div class="mb-3 flex items-center gap-3 rounded-lg bg-white/[.06] p-3">
                     <div
                         class="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500 text-sm font-bold text-white">
@@ -221,6 +282,27 @@
                         <p class="mt-0.5 text-xs font-semibold tracking-wide text-slate-400">{{ $roleLabel }}</p>
                     </div>
                 </div>
+
+                <!-- SETTINGS BUTTON -->
+                @if ($roleName === 'guru')
+                    <a href="{{ route('guru.settings.index') }}"
+                        class="sidebar-link {{ request()->routeIs('guru.settings.*') ? 'active' : '' }}">
+                        <i data-lucide="settings"></i>
+                        <span class="truncate">Pengaturan</span>
+                    </a>
+                @elseif ($roleName === 'penilai')
+                    <a href="{{ route('penilai.settings.index') }}"
+                        class="sidebar-link {{ request()->routeIs('penilai.settings.*') ? 'active' : '' }}">
+                        <i data-lucide="settings"></i>
+                        <span class="truncate">Pengaturan</span>
+                    </a>
+                @elseif ($roleName === 'admin')
+                    <a href="{{ route('admin.settings.index') }}"
+                        class="sidebar-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
+                        <i data-lucide="settings"></i>
+                        <span class="truncate">Pengaturan</span>
+                    </a>
+                @endif
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -336,6 +418,39 @@
     </div>
 
     <script>
+        // Apply theme preference on load
+        (function() {
+            const theme = '{{ auth()->user()->theme_preference ?? 'light' }}';
+            const html = document.documentElement;
+
+            function applyTheme(t) {
+                if (t === 'dark') {
+                    html.classList.add('dark');
+                } else if (t === 'light') {
+                    html.classList.remove('dark');
+                } else if (t === 'auto') {
+                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        html.classList.add('dark');
+                    } else {
+                        html.classList.remove('dark');
+                    }
+                }
+            }
+
+            applyTheme(theme);
+
+            // Watch for system theme changes when auto
+            if (theme === 'auto') {
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                    if (e.matches) {
+                        html.classList.add('dark');
+                    } else {
+                        html.classList.remove('dark');
+                    }
+                });
+            }
+        })();
+
         const renderIcons = () => {
             if (window.lucide) {
                 window.lucide.createIcons();

@@ -129,6 +129,64 @@ class DashboardController extends Controller
                 $a['score']
         );
 
+        $topTeachersChart = [
+            'labels' => [],
+            'scores' => [],
+        ];
+
+        foreach (array_slice($rankingGuru, 0, 5) as $item) {
+            $topTeachersChart['labels'][] =
+                $item['guru']->user->name;
+            $topTeachersChart['scores'][] =
+                $item['score'];
+        }
+
+        $evaluationStatusCounts = [
+            'draft' => Evaluation::where('status', 'draft')->count(),
+            'submitted' => Evaluation::where('status', 'submitted')->count(),
+            'revised' => Evaluation::where('status', 'revised')->count(),
+            'finalized' => Evaluation::where('status', 'finalized')->count(),
+        ];
+
+        $periodPerformance = [
+            'labels' => [],
+            'scores' => [],
+        ];
+
+        $periods = Period::orderBy('start_date')->get();
+
+        foreach ($periods as $period) {
+            $periodEvaluations = Evaluation::where(
+                'period_id',
+                $period->id
+            )
+                ->where('status', 'finalized')
+                ->get();
+
+            if ($periodEvaluations->isEmpty()) {
+                continue;
+            }
+
+            $scores = [];
+
+            foreach ($periodEvaluations as $evaluation) {
+                $scores[] = $service->calculateFinalScore(
+                    $evaluation->id
+                );
+            }
+
+            $periodPerformance['labels'][] = $period->name;
+            $periodPerformance['scores'][] = round(
+                array_sum($scores) / count($scores),
+                2
+            );
+        }
+
+        $schoolAverageByKriteria =
+            $service->schoolAverageByKriteria(
+                $activePeriod?->id
+            );
+
         /*
         =====================================
         VIEW
@@ -149,7 +207,11 @@ class DashboardController extends Controller
 
                 'activePeriod',
 
-                'rankingGuru'
+                'rankingGuru',
+                'topTeachersChart',
+                'evaluationStatusCounts',
+                'periodPerformance',
+                'schoolAverageByKriteria'
             )
         );
     }

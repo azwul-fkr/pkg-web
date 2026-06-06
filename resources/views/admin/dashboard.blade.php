@@ -284,6 +284,32 @@
 
     </div>
 
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3 mb-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 xl:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Performa Periode</h2>
+                    <p class="text-sm text-slate-500 mt-1">Rata-rata skor final guru per periode.</p>
+                </div>
+            </div>
+            <div class="h-72">
+                <canvas id="periodPerformanceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Status Evaluasi</h2>
+                    <p class="text-sm text-slate-500 mt-1">Distribusi progres penilaian saat ini.</p>
+                </div>
+            </div>
+            <div class="h-72">
+                <canvas id="evaluationStatusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     {{-- ================= SECOND SECTION ================= --}}
     <div class="
     grid
@@ -521,6 +547,48 @@
 
     </div>
 
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-3 mb-8">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 xl:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Top Guru Performance</h2>
+                    <p class="text-sm text-slate-500 mt-1">Lima guru dengan skor akhir tertinggi.</p>
+                </div>
+            </div>
+            <div class="h-80">
+                <canvas id="topTeachersChart"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Rata-rata Sekolah</h2>
+                    <p class="text-sm text-slate-500 mt-1">Benchmark kompetensi pada periode aktif.</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                @forelse($schoolAverageByKriteria as $kriteria => $score)
+                    <div>
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="font-medium text-slate-700">{{ $kriteria }}</span>
+                            <span class="font-bold text-slate-900">{{ $score }}</span>
+                        </div>
+                        <div class="mt-2 h-2 rounded-full bg-slate-100 overflow-hidden">
+                            <div class="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500"
+                                style="width: {{ min(100, max(0, $score)) }}%"></div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="rounded-2xl bg-slate-50 p-5 text-sm text-slate-500">
+                        Belum ada data evaluasi finalized untuk menghitung benchmark sekolah.
+                    </div>
+                @endforelse
+            </div>
+        </div>
+    </div>
+
     {{-- ================= RANKING GURU ================= --}}
     <div class="
     bg-white
@@ -713,3 +781,98 @@
     </div>
 
 @endsection
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        (() => {
+            const periodLabels = {!! json_encode($periodPerformance['labels'] ?? []) !!};
+            const periodScores = {!! json_encode($periodPerformance['scores'] ?? []) !!};
+            const statusCounts = {!! json_encode(array_values($evaluationStatusCounts ?? [])) !!};
+            const topLabels = {!! json_encode($topTeachersChart['labels'] ?? []) !!};
+            const topScores = {!! json_encode($topTeachersChart['scores'] ?? []) !!};
+
+            if (periodLabels.length) {
+                new Chart(document.getElementById('periodPerformanceChart'), {
+                    type: 'line',
+                    data: {
+                        labels: periodLabels,
+                        datasets: [{
+                            label: 'Rata-rata skor',
+                            data: periodScores,
+                            borderColor: '#0284c7',
+                            backgroundColor: 'rgba(14,165,233,0.15)',
+                            fill: true,
+                            tension: 0.35,
+                            pointRadius: 4,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+
+            new Chart(document.getElementById('evaluationStatusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Draft', 'Submitted', 'Revised', 'Finalized'],
+                    datasets: [{
+                        data: statusCounts,
+                        backgroundColor: ['#f59e0b', '#06b6d4', '#ef4444', '#22c55e'],
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            if (topLabels.length) {
+                new Chart(document.getElementById('topTeachersChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: topLabels,
+                        datasets: [{
+                            label: 'Final score',
+                            data: topScores,
+                            backgroundColor: ['#0ea5e9', '#06b6d4', '#14b8a6', '#22c55e', '#84cc16'],
+                            borderRadius: 12,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+            }
+        })();
+    </script>
+@endpush

@@ -35,25 +35,6 @@ class DashboardController extends Controller
             true
         )->first();
 
-        /*
-    =====================================
-    REFLECTION TERBARU
-    =====================================
-    */
-
-        $reflection = TeacherReflection::with(
-            'evaluation.period'
-        )
-
-            ->where(
-                'guru_id',
-                $guru->id
-            )
-
-            ->latest()
-
-            ->first();
-
         $totalEvidence = 0;
         $approvedEvidence = 0;
         $pendingEvidence = 0;
@@ -63,6 +44,14 @@ class DashboardController extends Controller
         $finalScore = null;
         $analytics = null;
         $gapAnalysis = null;
+        $reflection = null;
+        $recommendationEngine = null;
+        $schoolComparison = [];
+        $competencyComparisonChart = [
+            'labels' => [],
+            'guruScores' => [],
+            'schoolScores' => [],
+        ];
         $bestWorst = [
             'best' => null,
             'worst' => null,
@@ -84,9 +73,29 @@ class DashboardController extends Controller
                     'analytics',
                     'bestWorst',
                     'gapAnalysis',
+                    'reflection',
+                    'recommendationEngine',
+                    'schoolComparison',
+                    'competencyComparisonChart',
                 )
             );
         }
+
+        /*
+    =====================================
+    REFLECTION TERBARU
+    =====================================
+    */
+
+        $reflection = TeacherReflection::with(
+            'evaluation.period'
+        )
+            ->where(
+                'guru_id',
+                $guru->id
+            )
+            ->latest()
+            ->first();
 
         /*
         =====================================
@@ -137,11 +146,6 @@ class DashboardController extends Controller
             ->where(
                 'period_id',
                 $period?->id
-            )
-
-            ->where(
-                'status',
-                'finalized'
             )
 
             ->latest()
@@ -206,10 +210,50 @@ class DashboardController extends Controller
                     $evaluation->id
                 );
 
+            $recommendationEngine =
+                $service->generateRecommendations(
+                    $evaluation->id
+                );
+
+            $schoolComparison =
+                $service->compareEvaluationToSchool(
+                    $evaluation->id
+                );
+
+            foreach ($schoolComparison as $comparison) {
+                $competencyComparisonChart['labels'][] =
+                    $comparison['kriteria'];
+                $competencyComparisonChart['guruScores'][] =
+                    $comparison['guru_score'];
+                $competencyComparisonChart['schoolScores'][] =
+                    $comparison['school_average'];
+            }
+
             $bestWorst =
                 $service->bestAndWorstCompetency(
                     $analytics
                 );
+        }
+
+        // TREND: ambil beberapa evaluasi finalized terakhir untuk menampilkan grafik perkembangan
+        $trendLabels = [];
+        $trendScores = [];
+
+        if ($guru) {
+            $pastEvaluations = Evaluation::where(
+                'guru_id',
+                $guru->id
+            )
+                ->where('status', 'finalized')
+                ->latest()
+                ->take(6)
+                ->get()
+                ->reverse();
+
+            foreach ($pastEvaluations as $ev) {
+                $trendLabels[] = $ev->period->name ?? $ev->created_at->format('Y-m-d');
+                $trendScores[] = $service->calculateFinalScore($ev->id);
+            }
         }
 
         return view(
@@ -227,7 +271,12 @@ class DashboardController extends Controller
                 'analytics',
                 'bestWorst',
                 'gapAnalysis',
-                'reflection'
+                'reflection',
+                'recommendationEngine',
+                'schoolComparison',
+                'competencyComparisonChart',
+                'trendLabels',
+                'trendScores'
             )
         );
     }
