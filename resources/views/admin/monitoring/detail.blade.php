@@ -52,6 +52,8 @@
 
         <form method="POST" action="{{ route('admin.monitoring.review', $evaluation->id) }}" class="page-card">
             @csrf
+            <input type="hidden" name="feedback" value="{{ $evaluation->feedback }}">
+            <input type="hidden" name="recommendation" value="{{ $evaluation->recommendation }}">
 
             <div class="page-card-header">
                 <div>
@@ -62,13 +64,17 @@
 
             <div class="space-y-4 p-5">
                 <div>
-                    <label class="form-label">Feedback Penilai</label>
-                    <textarea name="feedback" rows="4" class="form-control">{{ $evaluation->feedback }}</textarea>
+                    <p class="form-label">Feedback Penilai</p>
+                    <div class="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                        {{ $evaluation->feedback ?: 'Penilai belum mengisi feedback.' }}
+                    </div>
                 </div>
 
                 <div>
-                    <label class="form-label">Rekomendasi Pengembangan</label>
-                    <textarea name="recommendation" rows="4" class="form-control">{{ $evaluation->recommendation }}</textarea>
+                    <p class="form-label">Rekomendasi Pengembangan Dari Penilai</p>
+                    <div class="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                        {{ $evaluation->recommendation ?: 'Penilai belum mengisi rekomendasi.' }}
+                    </div>
                 </div>
 
                 @if ($evaluation->status == 'submitted')

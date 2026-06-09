@@ -128,7 +128,8 @@
     <title>{{ $pageTitle }} - SIMPEG MTSs</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap"
+        rel="stylesheet" />
     <script src="https://unpkg.com/lucide@latest"></script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -142,23 +143,24 @@
             display: flex;
             align-items: center;
             gap: .75rem;
-            border-radius: .5rem;
-            padding: .65rem .75rem;
-            color: rgb(203 213 225);
+            border-radius: .875rem;
+            padding: .7rem .8rem;
+            color: rgba(226, 232, 240, .88);
             font-size: .875rem;
             font-weight: 600;
-            transition: background-color .18s ease, color .18s ease, box-shadow .18s ease;
+            transition: background-color .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
         }
 
         .sidebar-link:hover {
-            background: rgba(255, 255, 255, .06);
+            background: rgba(255, 255, 255, .09);
             color: #fff;
+            transform: translateX(2px);
         }
 
         .sidebar-link.active {
-            background: #0891b2;
+            background: linear-gradient(135deg, rgba(96, 165, 250, 1), rgba(14, 165, 233, .95));
             color: #fff;
-            box-shadow: 0 10px 22px rgba(8, 145, 178, .22);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, .24);
         }
 
         .sidebar-link i {
@@ -177,79 +179,88 @@
         }
 
         :root.dark body {
-            @apply bg-slate-950 text-slate-100;
+            background: #020617;
+            color: #e2e8f0;
         }
 
         :root.dark .page-card {
-            @apply bg-slate-900 border-slate-700;
+            background: rgba(15, 23, 42, .92);
+            border-color: rgba(51, 65, 85, .85);
+            box-shadow: 0 10px 30px rgba(2, 6, 23, .35);
         }
 
         :root.dark .page-card-header {
-            @apply border-slate-700;
+            border-color: rgba(51, 65, 85, .85);
         }
 
         :root.dark .form-control {
-            @apply bg-slate-800 border-slate-700 text-slate-100;
+            background: rgba(15, 23, 42, .95);
+            border-color: rgba(51, 65, 85, .9);
+            color: #e2e8f0;
         }
 
         :root.dark .form-control:focus {
-            @apply bg-slate-800 border-cyan-500;
+            background: rgba(15, 23, 42, .98);
+            border-color: #06b6d4;
         }
 
         :root.dark .form-label {
-            @apply text-slate-300;
+            color: #cbd5e1;
         }
 
         :root.dark .tab-btn {
-            @apply text-slate-300;
+            color: #cbd5e1;
         }
 
         :root.dark header {
-            @apply bg-slate-900/90 border-slate-700;
+            background: rgba(15, 23, 42, .88);
+            border-color: rgba(51, 65, 85, .85);
         }
 
         :root.dark .badge {
-            @apply bg-slate-700 text-slate-100;
+            color: #e2e8f0;
         }
 
-        :root.dark table {
-            @apply border-slate-700;
+        :root.dark .app-table thead {
+            background: rgba(15, 23, 42, .96);
         }
 
-        :root.dark th {
-            @apply bg-slate-800 text-slate-100 border-slate-700;
-        }
-
-        :root.dark td {
-            @apply border-slate-700;
+        :root.dark .app-table th,
+        :root.dark .app-table td {
+            border-color: rgba(51, 65, 85, .8);
         }
 
         :root.dark .empty-state {
-            @apply text-slate-400;
+            color: #94a3b8;
         }
     </style>
 </head>
 
-<body class="bg-slate-50 font-sans text-slate-800 antialiased">
+<body class="min-h-screen bg-slate-50 font-sans text-slate-800 antialiased">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 overflow-hidden">
+        <div class="absolute -right-24 top-24 h-72 w-72 rounded-full bg-cyan-500/10 blur-3xl"></div>
+        <div class="absolute -left-24 bottom-24 h-72 w-72 rounded-full bg-emerald-500/10 blur-3xl"></div>
+    </div>
+
     <div x-data="{ sidebarOpen: false }" class="min-h-screen lg:flex">
         <div x-cloak x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-40 bg-slate-950/40 lg:hidden"
             @click="sidebarOpen = false"></div>
 
         <aside
-            class="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-slate-800 bg-slate-950 text-white transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0"
+            class="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-blue-900/70 bg-gradient-to-b from-blue-950 via-blue-900 to-cyan-900 text-white shadow-2xl shadow-blue-950/30 backdrop-blur-xl transition-transform duration-200 lg:sticky lg:top-4 lg:m-4 lg:h-[calc(100vh-2rem)] lg:translate-x-0 lg:rounded-3xl"
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
             <div class="flex h-20 items-center gap-3 border-b border-white/10 px-5">
-                <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-cyan-500 text-white shadow-sm">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 text-white shadow-sm ring-1 ring-white/15">
                     <i data-lucide="graduation-cap" class="h-5 w-5"></i>
                 </div>
                 <div class="min-w-0">
                     <h1 class="truncate text-lg font-bold leading-tight">SIMPEG APP</h1>
-                    <p class="text-sm text-slate-400">MTS JIDRIS AS-SALAM</p>
+                    <p class="text-sm text-slate-200/80">MTS JIDRIS AS-SALAM</p>
                 </div>
             </div>
 
             <nav class="flex-1 overflow-y-auto px-4 py-5">
-                <p class="mb-3 px-2 text-[11px] font-bold uppercase tracking-[.18em] text-slate-500">
+                <p class="mb-3 px-2 text-[11px] font-bold uppercase tracking-[.18em] text-slate-300/70">
                     Menu Utama
                 </p>
 
@@ -272,14 +283,14 @@
             </nav>
 
             <div class="border-t border-white/10 p-4 space-y-3">
-                <div class="mb-3 flex items-center gap-3 rounded-lg bg-white/[.06] p-3">
+                <div class="mb-3 flex items-center gap-3 rounded-2xl bg-white/[.08] p-3 ring-1 ring-white/10">
                     <div
-                        class="flex h-10 w-10 items-center justify-center rounded-lg bg-cyan-500 text-sm font-bold text-white">
+                        class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 text-sm font-bold text-white ring-1 ring-white/10">
                         {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
                     </div>
                     <div class="min-w-0 flex-1">
                         <p class="truncate text-sm font-semibold">{{ $user->name ?? 'User' }}</p>
-                        <p class="mt-0.5 text-xs font-semibold tracking-wide text-slate-400">{{ $roleLabel }}</p>
+                        <p class="mt-0.5 text-xs font-semibold tracking-wide text-slate-200/70">{{ $roleLabel }}</p>
                     </div>
                 </div>
 
@@ -307,7 +318,7 @@
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit"
-                        class="flex w-full items-center justify-center gap-2 rounded-lg border border-red-400/20 bg-red-500/10 px-3 py-2.5 text-sm font-bold text-red-100 transition hover:bg-red-500 hover:text-white">
+                        class="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/10 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-white/15">
                         <i data-lucide="log-out" class="h-4 w-4"></i>
                         Logout
                     </button>
@@ -315,8 +326,8 @@
             </div>
         </aside>
 
-        <div class="flex min-h-screen flex-1 flex-col">
-            <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/90 backdrop-blur">
+        <div class="relative flex min-h-screen flex-1 flex-col">
+            <header class="sticky top-0 z-30 border-b border-slate-200 bg-white/85 backdrop-blur-xl">
                 <div class="flex h-20 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
                     <div class="flex min-w-0 items-center gap-3">
                         <button type="button"
@@ -343,7 +354,7 @@
                 </div>
             </header>
 
-            <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+            <main class="mx-auto flex-1 w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
                 {{-- SUCCESS ALERT --}}
                 @if (session('success'))
                     <div id="success-alert"

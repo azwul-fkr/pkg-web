@@ -10,95 +10,61 @@
                 <p class="page-card-subtitle">Ringkasan evidence dan status validasinya.</p>
             </div>
 
-            <span
-                class="badge {{ $evidence->status == 'approved' ? 'badge-success' : ($evidence->status == 'rejected' ? 'badge-danger' : 'badge-warning') }}">
+            <span class="badge {{ $evidence->status == 'approved' ? 'badge-success' : ($evidence->status == 'rejected' ? 'badge-danger' : 'badge-warning') }}">
                 {{ strtoupper($evidence->status) }}
             </span>
         </div>
 
-        <div class="grid gap-5 p-5 sm:grid-cols-2">
-            <div>
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Kriteria</p>
-                <p class="mt-1 font-semibold text-slate-900">{{ $evidence->kriteria?->name ?? '-' }}</p>
+        <div class="grid gap-4 p-5 sm:grid-cols-2 sm:gap-5">
+            <div class="rounded-2xl bg-slate-50/80 p-4">
+                <p class="text-[11px] font-semibold uppercase tracking-[.18em] text-slate-500">Kriteria</p>
+                <p class="mt-2 text-sm font-semibold text-slate-900">{{ $evidence->kriteria?->name ?? '-' }}</p>
             </div>
-            <div>
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Kompetensi</p>
-                <p class="mt-1 font-semibold text-slate-900">{{ $evidence->subKriteria?->name ?? '-' }}</p>
+            <div class="rounded-2xl bg-slate-50/80 p-4">
+                <p class="text-[11px] font-semibold uppercase tracking-[.18em] text-slate-500">Kompetensi</p>
+                <p class="mt-2 text-sm font-semibold text-slate-900">{{ $evidence->subKriteria?->name ?? '-' }}</p>
             </div>
-            <div class="sm:col-span-2">
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Indikator</p>
-                <p class="mt-1 font-semibold text-slate-900">{{ $evidence->indikator?->name ?? '-' }}</p>
+            <div class="rounded-2xl bg-slate-50/80 p-4 sm:col-span-2">
+                <p class="text-[11px] font-semibold uppercase tracking-[.18em] text-slate-500">Indikator</p>
+                <p class="mt-2 text-sm font-semibold text-slate-900">{{ $evidence->indikator?->name ?? '-' }}</p>
             </div>
-            <div>
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Mata Pelajaran</p>
-                <p class="mt-1 text-slate-800">{{ $evidence->subject }}</p>
+            <div class="rounded-2xl bg-slate-50/80 p-4">
+                <p class="text-[11px] font-semibold uppercase tracking-[.18em] text-slate-500">Mata Pelajaran</p>
+                <p class="mt-2 text-sm text-slate-700">{{ $evidence->subject }}</p>
             </div>
-            <div>
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Kelas</p>
-                <p class="mt-1 text-slate-800">{{ $evidence->kelas }}</p>
+            <div class="rounded-2xl bg-slate-50/80 p-4">
+                <p class="text-[11px] font-semibold uppercase tracking-[.18em] text-slate-500">Kelas</p>
+                <p class="mt-2 text-sm text-slate-700">{{ $evidence->kelas }}</p>
             </div>
-            <div>
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Tanggal</p>
-                <p class="mt-1 text-slate-800">{{ $evidence->tanggal }}</p>
+            <div class="rounded-2xl bg-slate-50/80 p-4">
+                <p class="text-[11px] font-semibold uppercase tracking-[.18em] text-slate-500">Tanggal</p>
+                <p class="mt-2 text-sm text-slate-700">{{ $evidence->tanggal }}</p>
             </div>
-            <div>
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">File Evidence</p>
+            <div class="rounded-2xl bg-slate-50/80 p-4">
+                <p class="text-[11px] font-semibold uppercase tracking-[.18em] text-slate-500">File Evidence</p>
                 @php
-
                     $extension = strtolower(pathinfo($evidence->file, PATHINFO_EXTENSION));
-
                 @endphp
 
-                {{-- =====================================================
-    PREVIEW FILE
-====================================================== --}}
                 @if (in_array($extension, ['pdf', 'jpg', 'jpeg', 'png']))
-                    <a href="{{ asset('storage/' . $evidence->file) }}" target="_blank"
-                        class="
-            inline-flex
-            items-center
-            gap-2
-            text-cyan-600
-            hover:text-cyan-700
-            font-medium
-            transition
-        ">
-
-                        <i data-lucide="eye" class="w-4 h-4"></i>
-
+                    <a href="{{ asset('storage/' . $evidence->file) }}" target="_blank" class="link-action mt-2">
+                        <i data-lucide="eye" class="h-4 w-4"></i>
                         Lihat File
-
                     </a>
-
-                    {{-- =====================================================
-    DOWNLOAD FILE
-====================================================== --}}
                 @else
-                    <a href="{{ asset('storage/' . $evidence->file) }}" download
-                        class="
-            inline-flex
-            items-center
-            gap-2
-            text-emerald-600
-            hover:text-emerald-700
-            font-medium
-            transition
-        ">
-
-                        <i data-lucide="download" class="w-4 h-4"></i>
-
+                    <a href="{{ asset('storage/' . $evidence->file) }}" download class="link-action mt-2 text-emerald-700 hover:text-emerald-900">
+                        <i data-lucide="download" class="h-4 w-4"></i>
                         Download File
-
                     </a>
                 @endif
             </div>
             <div class="sm:col-span-2">
-                <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Deskripsi</p>
-                <p class="mt-1 rounded-lg bg-slate-50 p-4 text-slate-700">{{ $evidence->description }}</p>
+                <p class="text-[11px] font-semibold uppercase tracking-[.18em] text-slate-500">Deskripsi</p>
+                <p class="mt-2 rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-700">{{ $evidence->description }}</p>
             </div>
         </div>
 
-        <div class="border-t border-slate-200 px-5 py-4">
+        <div class="border-t border-slate-200/80 px-5 py-4">
             <a href="{{ route('guru.evidence.index') }}" class="btn-secondary">Kembali</a>
         </div>
     </div>

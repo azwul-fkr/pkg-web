@@ -823,7 +823,7 @@ class EvaluationController extends Controller
             );
     }
 
-    public function finalSubmit($id)
+    public function finalSubmit(Request $request, $id)
     {
         /*
     =====================================================
@@ -833,6 +833,11 @@ class EvaluationController extends Controller
 
         $evaluation = Evaluation::findOrFail($id);
 
+        $validated = $request->validate([
+            'feedback' => ['required', 'string', 'min:10'],
+            'recommendation' => ['required', 'string', 'min:10'],
+        ]);
+
         /*
     =====================================================
     UPDATE STATUS
@@ -841,7 +846,11 @@ class EvaluationController extends Controller
 
         $evaluation->update([
 
-            'status' => 'submitted'
+            'status' => 'submitted',
+
+            'feedback' => $validated['feedback'],
+
+            'recommendation' => $validated['recommendation'],
 
         ]);
 

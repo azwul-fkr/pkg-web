@@ -36,7 +36,7 @@
                             <tr>
                                 <td class="font-semibold text-slate-900">{{ $e->guru->user->name }}</td>
                                 <td>{{ $e->subject }}</td>
-                                <td>{{ $e->class }}</td>
+                                <td>{{ $e->kelas }}</td>
                                 <td>{{ $e->tanggal }}</td>
                                 <td>
                                     <a href="{{ asset('storage/' . $e->file) }}" target="_blank" class="link-action">Lihat File</a>

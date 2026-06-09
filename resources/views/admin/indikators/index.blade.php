@@ -75,7 +75,7 @@
             </div>
         </div>
 
-        <div id="indikatorModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 px-4">
+        <div id="indikatorModal" class="fixed inset-0 z-[60] hidden items-center justify-center bg-slate-950/50 px-4">
             <div class="w-full max-w-2xl rounded-lg bg-white shadow-xl">
                 <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
                     <h3 id="indikatorModalTitle" class="page-card-title">Tambah Indikator</h3>
